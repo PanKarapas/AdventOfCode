@@ -19,23 +19,26 @@ main = do
         contents <- hGetContents handle
         let times = getNumbers (head (lines contents))
         let records = getNumbers (lines contents !! 1)
-
-        putStrLn ("Part 1: " ++ show (product ([length (getTimesThatBeatRecord (times !! i) (records !! i)) | i <- [0 .. length times - 1]])))
-        putStrLn ("Part 2: " ++ show (records))
+        putStrLn ("Part 1: " ++ show (product ([length (getHoldTimesThatBeatRecord (times !! i) (records !! i)) | i <- [0 .. length times - 1]])))
+        let badlyKernedTime = getBadlyKernedNumber (head (lines contents))
+        let badlyKernedRecord = getBadlyKernedNumber (lines contents !! 1)
+        putStrLn ("Part 2: " ++ show (length (getHoldTimesThatBeatRecord badlyKernedTime badlyKernedRecord)))
         endTime <- getCurrentTime
         putStrLn ("Execution time: " ++ show (diffUTCTime endTime startTime))
         hClose handle
 
 ---- Part 1 ----
 
-getTimesThatBeatRecord :: Int -> Int -> [Int]
-getTimesThatBeatRecord totalTime record = do
+getHoldTimesThatBeatRecord :: Int -> Int -> [Int]
+getHoldTimesThatBeatRecord totalTime record = do
     let lowerBound = ceiling ((fromIntegral (negate totalTime) + sqrt (fromIntegral (totalTime * totalTime - 4*record)))/fromIntegral (negate 2)+0.0001)
     let upperBound = floor ((fromIntegral (negate totalTime) - sqrt (fromIntegral (totalTime * totalTime - 4*record)))/fromIntegral (negate 2)-0.0001)
     [lowerBound..upperBound]
 
 ---- Part 2 ----
 
+getBadlyKernedNumber :: String -> Int
+getBadlyKernedNumber xs = read (concat (splitBy ' ' (splitBy ':' xs !! 1)))
 
 ---- Common ----
 
@@ -55,5 +58,3 @@ splitBy' d (x:xs) acc
     | x == d  && acc /= ""= acc : splitBy' d xs ""
     | x == d = splitBy' d xs ""
     |otherwise = splitBy' d xs (acc ++ [x])
-
----- Data ----
